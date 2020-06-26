@@ -1,6 +1,7 @@
 package com.usian.controller;
 
 
+import com.usian.CatResult;
 import com.usian.pojo.TbItemCat;
 import com.usian.service.ItemCatService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,4 +25,8 @@ public class ItemCatController {
         return itemCatService.selectItemCategoryByParentId(id);
     }
 
+    @RequestMapping("/selectItemCategoryAll")
+    public CatResult selectItemCategoryAll(){
+        return itemCatService.selectItemCategoryAll();
+    }
 }

@@ -40,4 +40,11 @@ public class ItemParamController {
         return itemParamService.insertItemParam(itemCatId,paramData);
     };
 
+    @RequestMapping("/selectTbItemParamItemByItemId")
+    public TbItemParamItem selectTbItemParamItemByItemId(@RequestParam Long itemId){
+        return itemParamService.selectTbItemParamItemByItemId(itemId);
+    }
+
+
+
 }

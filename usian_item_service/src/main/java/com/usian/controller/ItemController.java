@@ -4,6 +4,7 @@ package com.usian.controller;
 import com.usian.PageResult;
 import com.usian.pojo.PreItemVo;
 import com.usian.pojo.TbItem;
+import com.usian.pojo.TbItemDesc;
 import com.usian.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,16 +46,25 @@ public class ItemController {
     }
 
 
-
     @RequestMapping("/insertTbItem")
-    public void  insertTbItem(@RequestBody TbItem tbItem,@RequestParam String desc,@RequestParam String itemParams){
-        itemService.insertTbItem(tbItem,desc,itemParams);
+    public void insertTbItem(@RequestBody TbItem tbItem, @RequestParam String desc, @RequestParam String itemParams) {
+        itemService.insertTbItem(tbItem, desc, itemParams);
     }
 
     @RequestMapping("/updateTbItem")
-    public void updateTbItem(@RequestBody TbItem tbItem, @RequestParam String desc, @RequestParam String itemParams){
-        itemService.updateTbItem(tbItem,desc,itemParams);
+    public void updateTbItem(@RequestBody TbItem tbItem, @RequestParam String desc, @RequestParam String itemParams) {
+        itemService.updateTbItem(tbItem, desc, itemParams);
 
+    }
+
+    /**
+     * 根据itemId查询商品详情
+     * @param itemId
+     * @return
+     */
+    @RequestMapping("/selectItemDescByItemId")
+    public TbItemDesc selectItemDescByItemId(Long itemId) {
+        return itemService.selectItemDescByItemId(itemId);
     }
 
 }

@@ -39,7 +39,6 @@ public class FileUploadController {
                 //文件内容不合法，直接返回
                 return Result.error("文件类型不合法:"+filename);
             }
-
             //校验文件的内容
             BufferedImage read = ImageIO.read(file.getInputStream());
             if(read==null){

@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: usian-detail-web
+server:
+  port: 8097
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka/
+ITEM_INFO: ITEM_INFO
+BASE: BASE
+DESC: DESC
+PARAM: PARAM
+ITEM_INFO_EXPIRE: 86400

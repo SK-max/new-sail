@@ -27,8 +27,6 @@ public class ContentCatgoryServiceImpl implements ContentCatgoryService {
     @Autowired
     private TbContentCategoryMapper categoryMapper;
 
-    @Autowired
-    private TbContentMapper tbContentMapper;
 
 
     /**

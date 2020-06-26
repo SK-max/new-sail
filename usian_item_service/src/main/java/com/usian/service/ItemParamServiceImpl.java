@@ -3,13 +3,20 @@ package com.usian.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.sun.org.apache.regexp.internal.RE;
 import com.usian.PageResult;
+import com.usian.mapper.TbItemParamItemMapper;
 import com.usian.mapper.TbItemParamMapper;
 import com.usian.pojo.TbItemParam;
 import com.usian.pojo.TbItemParamExample;
+import com.usian.pojo.TbItemParamItem;
+import com.usian.pojo.TbItemParamItemExample;
+import com.usian.redis.RedisClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Date;
 import java.util.List;
 
@@ -17,8 +24,25 @@ import java.util.List;
 @Transactional
 public class ItemParamServiceImpl implements ItemParamService {
 
+
+    @Value("${ITEM_INFO}")
+    private String ITEM_INFO;
+
+    @Value("${PARAM}")
+    private String PARAM;
+
+    @Value("${ITEM_INFO_EXPIRE}")
+    private Long ITEM_INFO_EXPIRE;
+
+    @Autowired
+    private RedisClient redisClient;
+
+
     @Autowired
     private TbItemParamMapper tbItemParamMapper;
+
+    @Autowired
+    private TbItemParamItemMapper tbItemParamItemMapper;
 
 
     public TbItemParam selectItemParamByItemCatId(Long itemCatId) {
@@ -65,5 +89,31 @@ public class ItemParamServiceImpl implements ItemParamService {
         param.setUpdated(date);
         param.setUpdated(date);
         return tbItemParamMapper.insertSelective(param);
+    }
+
+
+
+    /**
+     * 查询商品参数详情
+     *
+     * @param itemId
+     * @return
+     */
+    @Override
+    public TbItemParamItem selectTbItemParamItemByItemId(Long itemId) {
+        TbItemParamItem tbItemParamItem = (TbItemParamItem) redisClient.get(ITEM_INFO + ":" + itemId + ":" + PARAM);
+        if (tbItemParamItem != null) {
+            return tbItemParamItem;
+        }
+        TbItemParamItemExample example = new TbItemParamItemExample();
+        TbItemParamItemExample.Criteria criteria = example.createCriteria();
+        criteria.andItemIdEqualTo(itemId);
+        List<TbItemParamItem> list = tbItemParamItemMapper.selectByExampleWithBLOBs(example);
+        if (list != null && list.size() > 0) {
+            redisClient.set(ITEM_INFO + ":" + itemId + ":" + PARAM, list.get(0));
+            redisClient.expire(ITEM_INFO + ":" + itemId + PARAM, ITEM_INFO_EXPIRE);
+            return list.get(0);
+        }
+        return null;
     }
 }

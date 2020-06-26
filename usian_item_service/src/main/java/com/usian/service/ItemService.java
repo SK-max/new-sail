@@ -4,6 +4,7 @@ package com.usian.service;
 import com.usian.PageResult;
 import com.usian.pojo.PreItemVo;
 import com.usian.pojo.TbItem;
+import com.usian.pojo.TbItemDesc;
 
 public interface ItemService {
 
@@ -46,4 +47,17 @@ public interface ItemService {
      */
     void updateTbItem(TbItem tbItem, String desc, String itemParams);
 
+    /**
+     * 根据itemId查询商品详情
+     * @param itemId
+     * @return
+     */
+    TbItemDesc selectItemDescByItemId(Long itemId) ;
+
+    /**
+     * 根据订单ID扣减库存
+     * @param orderId
+     * @return
+     */
+    Integer updateTbItemByOrderId(String orderId);
 }

@@ -1,9 +1,9 @@
 package com.usian.service;
 
+import com.usian.AdNode;
 import com.usian.PageResult;
 import com.usian.pojo.TbContent;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 
 public interface ContentService {
@@ -13,4 +13,6 @@ public interface ContentService {
     void insertTbcontent(TbContent tbContent);
 
     void deleteContentByIds(Long ids);
+
+    List<AdNode> selectFrontendContentByAD();
 }

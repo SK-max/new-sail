@@ -83,6 +83,22 @@
     consign_time, end_time, close_time, shipping_name, shipping_code, user_id, buyer_message, 
     buyer_nick, buyer_rate
   </sql>
+
+  <!--查询超时订单-->
+  <select id="selectOvertimeOrder" resultMap="BaseResultMap">
+    SELECT
+    *
+    FROM
+    tb_order t
+    WHERE
+    t.create_time&lt;DATE_SUB(NOW(),INTERVAL 2 DAY)
+    AND t.status=1
+    AND t.payment_type=1
+
+  </select>
+
+
+
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.usian.pojo.TbOrderExample" >
     select
     <if test="distinct" >
@@ -398,4 +414,7 @@
       buyer_rate = #{buyerRate,jdbcType=INTEGER}
     where order_id = #{orderId,jdbcType=VARCHAR}
   </update>
+
+
+
 </mapper>

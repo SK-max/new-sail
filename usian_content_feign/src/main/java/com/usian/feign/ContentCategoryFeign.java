@@ -1,6 +1,7 @@
 package com.usian.feign;
 
 
+import com.usian.AdNode;
 import com.usian.PageResult;
 import com.usian.pojo.TbContent;
 import com.usian.pojo.TbContentCategory;
@@ -35,4 +36,9 @@ public interface ContentCategoryFeign {
 
     @RequestMapping("/service/contentCategory/deleteContentByIds")
     void deleteContentByIds(@RequestParam Long ids);
+
+    @RequestMapping("/service/content/selectFrontendContentByAD")
+    List<AdNode> selectFrontendContentByAD();
+
+
 }

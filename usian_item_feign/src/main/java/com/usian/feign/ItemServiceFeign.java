@@ -1,10 +1,10 @@
 package com.usian.feign;
 
 
+import com.usian.CatResult;
 import com.usian.PageResult;
 import com.usian.pojo.*;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,7 +46,6 @@ public interface ItemServiceFeign {
 
     /**
      * 修改商品信息
-     *
      * @param tbItem
      */
     @RequestMapping("/service/item/updateTbItem")
@@ -66,4 +65,18 @@ public interface ItemServiceFeign {
 
     @RequestMapping("/service/itemParam/insertItemParam")
     Integer insertItemParam(@RequestParam Long itemCatId, @RequestParam String paramData);
+
+    @RequestMapping("/service/itemCategory/selectItemCategoryAll")
+    CatResult selectItemCategoryAll();
+
+    @RequestMapping("/service/item/selectItemDescByItemId")
+    TbItemDesc selectItemDescByItemId(@RequestParam Long itemId);
+
+    /**
+     * 查询商品参数详情并返回
+     * @param itemId
+     * @return
+     */
+    @RequestMapping("/service/itemParam/selectTbItemParamItemByItemId")
+    TbItemParamItem selectTbItemParamItemByItemId(@RequestParam Long itemId);
 }

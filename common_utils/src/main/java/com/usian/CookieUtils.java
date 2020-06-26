@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 /**
- * 
+ *
  * Cookie 工具类
  *
  */
@@ -18,7 +18,7 @@ public final class CookieUtils {
 
     /**
      * 得到Cookie的值, 不编码
-     * 
+     *
      * @param request
      * @param cookieName
      * @return
@@ -29,7 +29,7 @@ public final class CookieUtils {
 
     /**
      * 得到Cookie的值,
-     * 
+     *
      * @param request
      * @param cookieName
      * @return
@@ -59,7 +59,7 @@ public final class CookieUtils {
 
     /**
      * 得到Cookie的值,
-     * 
+     *
      * @param request
      * @param cookieName
      * @return
@@ -126,14 +126,13 @@ public final class CookieUtils {
     /**
      * 删除Cookie带cookie域名
      */
-    public static void deleteCookie(HttpServletRequest request, HttpServletResponse response,
-            String cookieName) {
+    public static void deleteCookie(HttpServletRequest request, HttpServletResponse response,String cookieName,String cookieValue, int cookieMaxage,String encodeString) {
         doSetCookie(request, response, cookieName, "", -1, false);
     }
 
     /**
      * 设置Cookie的值，并使其在指定时间内生效
-     * 
+     *
      * @param cookieMaxage cookie生效的最大秒数
      */
     private static final void doSetCookie(HttpServletRequest request, HttpServletResponse response,
@@ -141,7 +140,7 @@ public final class CookieUtils {
         try {
             if (cookieValue == null) {
                 cookieValue = "";
-            } 
+            }
             if (isEncode) {
                 cookieValue = URLEncoder.encode(cookieValue, "utf-8");
             }
@@ -164,7 +163,7 @@ public final class CookieUtils {
 
     /**
      * 设置Cookie的值，并使其在指定时间内生效
-     * 
+     *
      * @param cookieMaxage cookie生效的最大秒数
      */
     private static final void doSetCookie(HttpServletRequest request, HttpServletResponse response,
