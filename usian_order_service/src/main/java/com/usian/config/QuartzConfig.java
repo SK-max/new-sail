@@ -50,7 +50,6 @@ public class QuartzConfig {
         //关联trigger
         factory.setTriggers(cronTriggerFactoryBean.getObject());
         factory.setJobFactory(myAdaptableJobFactory);
-
         return factory;
     }
 

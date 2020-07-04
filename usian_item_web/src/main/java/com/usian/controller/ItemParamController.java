@@ -23,6 +23,7 @@ public class ItemParamController {
 
     @RequestMapping("/selectItemParamByItemCatId/{itemCatId}")
     public Result selectItemParamByItemCatId(@PathVariable Long itemCatId) {
+
         TbItemParam itemParam = itemServiceFeign.selectItemParamByItemCatId(itemCatId);
         if (itemParam != null) {
             return Result.ok(itemParam);

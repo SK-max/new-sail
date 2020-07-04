@@ -80,7 +80,6 @@ public class CartController {
                         TbItem tbItem = cartMap.get(key);
                         tblist.add(tbItem);
                     }
-                CookieUtils.deleteCookie();
                 } else {
                     //如果不为空则为登录状态
                     Map<String, TbItem> cart = getCartFromRedis(userId);

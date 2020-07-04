@@ -23,10 +23,12 @@ public class ItemCatController {
 
     @RequestMapping("/selectItemCategoryByParentId")
     public Result selectItemCategoryByParentId(@RequestParam (defaultValue = "0") Long id) {
+        System.out.println("哈哈哈哈");
         List<TbItemCat> list = itemServiceFeign.selectItemCategoryByParentId(id);
         if(list!=null&&list.size()>0){
             return Result.ok(list);
         }
+        System.out.println("嘻嘻嘻嘻");
         return Result.error("查无结果");
     }
 

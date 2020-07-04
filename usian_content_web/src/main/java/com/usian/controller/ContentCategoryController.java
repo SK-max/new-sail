@@ -20,19 +20,17 @@ public class ContentCategoryController {
 
     @RequestMapping("/selectContentCategoryByParentId")
     public Result selectContentCategoryByParentId(@RequestParam(defaultValue = "0") Long id) {
-        try {
             List<TbContentCategory> list = categoryFeign.selectContentCategoryByParentId(id);
-            return Result.ok(list);
-        } catch (Exception e) {
-            e.printStackTrace();
+            if(list!=null&&list.size()>0){
+                return Result.ok(list);
+            }
             return Result.error("查无结果");
-        }
+
     }
 
     @RequestMapping("/insertContentCategory")
     public Result insertContentCategory(TbContentCategory tbContentCategory) {
         try {
-
             categoryFeign.insertContentCategory(tbContentCategory);
             return Result.ok();
         } catch (Exception e) {
@@ -46,7 +44,6 @@ public class ContentCategoryController {
     public Result deleteContentCategoryById(@RequestParam Long categoryId) {
         try {
             Integer num = categoryFeign.deleteContentCategoryById(categoryId);
-
             if (num > 0) {
                 return Result.ok();
             } else {

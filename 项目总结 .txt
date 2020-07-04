@@ -1,0 +1,384 @@
+--------------------01、工程搭建------------------------
+一、电商的概念
+	c2c：淘宝集市
+	b2c：京东
+	b2b：阿里巴巴批发网
+	b2c平台：天猫商城、京东商城
+
+二、商城简介
+	xxx是一个b2c商城
+
+三、工程搭建
+	usian_parent
+		common_eureka
+		common_pojo
+		common_utils
+		common_mapper
+		usian_item_service
+		usian_item_feign
+		usian_item_web		
+
+四、发布工程到github
+	注意：
+		1、每天早上更新代码
+		2、写一个提交一个
+
+------------------------02、商品管理-------------------------
+一、商品列表查询
+	mybatis+pagehelp
+
+二、商品添加
+	1、商品类目：前端tree  后端json
+	2、图片上传：FastDFS+nginx
+	3、商品规格模板
+		1、商品规格模板：查询
+		2、商品规格：保存
+
+三、面试题
+	商品是几张表？每张表的作用？
+		tb_item
+		tb_item_cat
+		tb_item_desc
+		tb_item_param
+		tb_item_param_item
+
+--------------------------03、商品规格模板管理--------------------------
+一、数据库设计
+	1、传统数据库设计
+		商品-----类别表------分组
+						    |
+						    |
+						    |
+	        商品--子项	         子项
+
+	     问题：一个商品就要在商品--子项表中录入几十条数据
+
+	2、优化后的数据库设计
+		a、优化规格模板：把模板数据设置到一列以特定的json格式存储
+			tb_item_param：
+				item_cat_id       param_data
+				   3                    {主体:{上市年份,品牌}} 
+
+		b、优化规格信息：把商品--子项信息设置到一列以特定的json格式存储
+			tb_item_param_item：	
+				 item_id             param_data
+				    520                 {主体:{上市年份:2019,品牌;华为}} 
+				    521		   {主体:{上市年份:2020,品牌:小米}} 	
+
+
+
+二、商品规格模板添加
+	1、选择商品类目
+	2、填写分组和子项，并保存
+
+三、商品规格模板删除
+
+
+------------------------04、内容管理---------------------------
+一、内容分类管理
+	1、查询：前端tree、后端json
+	2、添加：如果他爹不是爹，要把他爹改成爹
+	3、删除：如果他爹不是爹，要把他爹改成不是爹 | 注意：有子节点则不能删除
+
+二、内容管理
+	正删改查首页大广告
+
+-------------------------05、商城首页--------------------
+一、商城首页展示
+	查询数据库
+
+二、redis缓存商品类别和首页大广告
+ 1、添加缓存
+	注意：不能改变原有逻辑
+
+ 2、缓存同步
+	后台添加、删除、修改广告时
+ 
+-------------------------06、商品搜索--------------------	
+1、导入商品到索引库
+	每次导入1000条
+	es怎么管理商品？分2个p分片1个r分片，搭建集群需要2台服务器
+
+2、商品搜索
+	分页查询名称、卖点、描述、类别包括关键字的商品高亮显示
+
+3、索引库同步？为什么？
+	同步：usian_item_service----->MQ<-------usian_search_service
+	为什么：解耦合
+
+-------------------------07、商品详情--------------------	
+方案一：thymeleaf网页静态化
+	1、创建商品详情的thymeleaf模板
+	2、创建RabbitMQ消费者，收到消息后生成静态页面（D:/detail/26774635180.html）
+	3、搭建nginx服务器，返回静态页面
+
+方案二：redis
+  a、redis缓存商品详情
+	 1、先查询redis，如果有直接返回
+	 2、再查询mysql，并把查询结果装到redis中再返回
+
+  b、如何保证redis不满？redis中都是热点商品？
+	设置商品的失效时间：86400
+
+		数据类型：
+			ITEM_INFO:123456:BASE
+			ITEM_INFO:123456:DESC
+			ITEM_INFO:123456:PARAM
+
+  c、缓存穿透、击穿、雪崩？
+	穿透：缓存和数据库中都没有，每次请求都会穿过缓存直接访问数据库  解决方案：空对象也缓存并设置失效时间
+	击穿：大批量的请求集中对一个key不停访问，直到key失效  解决方案：分布式锁（1、释放锁：del    2、业务处理失败：expire）
+	雪崩：缓存集中过期   解决方案：失效时间随机或按商品类别设置不同的失效时间
+
+
+---------------------------08、单点登录------------------------------
+一、单点登录介绍
+	1、什么是单点登录？
+		SSO英文全称Single Sign On，单点登录，登录一次处处可用
+
+	2、思路
+		存(登录)：redis(token , user)                        cookie(token_key ,token)
+					
+		取(查询用户)：cookie(token)                redis(user)
+
+
+----------------------------09、购物车-------------------------------
+1、未登录：把商品信息装cookie(CART_COOKIE_KEY，map_json)
+	优点：不占用服务端资源
+	缺点：购物车信息不同步
+
+2、登录：把商品信息装redis(CART_REDIS_KEY，user_id，map_json)
+	缺点：占用服务端资源
+	优点：购物车信息同步
+
+----------------------------10、订单-----------------------------------
+一、强制登录
+  1、在拦截器中根据token查询redis判断用户是否登录：登录则放行，未登录则跳转到登录页
+
+二、展示订单确认页
+  1、展示购物车中的商品
+
+三、订单提交
+	1、如何生成订单id？
+		时间戳+redis自增id             时间戳+用户id/手机号              时间戳+用户id+店铺
+
+	2、保存订单数据
+			 订单表、订单明细表、物流表
+
+四、扣库存
+	1、发送mq
+						     orderId
+		usian_order_service------------------>mq<--------------usian_item_service
+
+	2、usian_item_service：
+		通过orderId查询订单商品列表--->List<TbOrderItem>  tbOrderItemList
+	
+	3、usian_item_service：
+		遍历tbOrderItemList--->TbOrderItem(item_id，num)
+		根据item_id和num修改库存
+
+五、关闭超时订单
+	a、quartz定时任务，每分钟执行一次：
+		1、查询超时订单：创建时间<=now()-2天      线上付款    未付款
+		2、关闭超时订单：状态为6     结束时间、修改时间、关闭时间为当前时间
+		2、把商品表的库存加回去
+
+	b、quartz集群任务重复执行
+		1、分布式锁：setnx
+		2、释放锁：del
+		3、避免死锁：失效时间30s
+
+----------------------------------11、分布式事务--------------------------------
+一、本地事务
+	1、mysql控制事物
+		begin tran
+		  sql1
+		  sql2
+		commit tran/rollback
+
+	2、jdbc控制事务
+		conn.setAutoCommit(false);
+		try{
+			sql1;
+			sql2;
+			int a=6/0;
+			conn.commit();
+		}catch(Eeception e){
+			conn.rollback();
+		}
+
+	3、aop控制事务
+		aop生成service的代理类，方法执行前begin tran，方法执行后commit tran或rollback
+
+二、分布式事务
+	1、场景
+		两个service 或者 两个数据库
+	
+	2、什么是可靠消息最终一致性？
+		 可靠消息：上游服务把消息成功发送  下游服务把消息成功消费
+		 最终一致性：下游服务最终成功处理业务
+
+	3、可靠消息最终一致性要解决的问题？
+		a、上游服务把消息成功发送
+			 本地消息表+quartz
+				tx_no
+				order_id
+				status
+		b、下游服务把消息成功消费
+			 持久化+手动确认
+				持久化： @Queue(durable = "true")
+
+		c、下游服务对消息做幂等
+			 消息去重表：
+				tx_no
+				create_time
+		
+-------------------------------12、分布式日志、swagger------------------------------------
+一、ELK技术栈的介绍
+	1、什么是ELK?
+		elasticsearch：全文检索服务器
+		kibana：对es存储的数据进行可视化分析
+		logstash：负责搜集日志，并将数据发送到es
+
+	2、为什么要使用elk？
+		无法多维度搜索
+		大日志搜索太慢
+		分布式环境日志比较分散
+	3、springcloud整合elk
+		a、pom.xml
+			logstash-logback-encoder
+
+		b、logback.xml
+			    <root level="DEBUG">
+				<appender-ref ref="Stdout" />
+				<appender-ref ref="RollingFile" />
+				<appender-ref ref="logstash" />
+			    </root>
+	
+二、swagger
+	1、swagger介绍
+		a、什么是swagger
+			swagger是实现了openapi规范的工具集，用于生产api文档并提供可视化的restful风格的web服务
+	
+	2、swagger使用
+		1、pom.xml
+			springfox-swagger2
+			springfox-swagger-ui
+		2、config
+			@Configuration
+			@EnableSwagger2
+			public class SwaggerConfig{
+				 @Bean
+				 public Docket getDocket(){....}
+				 private ApiInfo apiInfo(){....}
+			}
+		3、controller、pojo
+			@Api()：描述controller
+			@ApiOperation()：描述方法
+			@ApiImplicitParam()：描述参数
+			@ApiImplicitParams()：描述多个参数
+			@APIModel()：描述对象参数
+			@ApiModelProperty()：描述对象中的属性
+
+
+	
+------------------------13、mysql主从复制、mycat读写分离、mycat分库分表-------------------------------------------
+一、主从复制
+	1、安装mysql
+		a、解压
+			tar -zxvf mysql-5.6.31-linux-glibc2.5-x86_64.tar.gz -C /usr/java
+			mv mysql-5.6.31-linux-glibc2.5-x86_64 mysql
+                b、拷贝配置文件到etc
+			cp support-files/my-default.cnf /etc/my.cnf
+			cp support-files/mysql.server /etc/rc.d/init.d/mysql
+			vim /etc/my.cnf
+				basedir = /usr/java/mysql
+				datadir = /usr/java/mysql/data
+				log-error = /usr/java/mysql/data/error.log
+				pid-file = /usr/java/mysql/data/mysql.pid
+				user = root
+				tmpdir = /tmp
+		c、初始化mysql
+			./scripts/mysql_install_db --user=root --basedir=/usr/java/mysql --datadir=/usr/java/mysql/data --pid-file=/usr/java/mysql/data/mysql.pid --tmpdir=/tmp
+		
+		d、配置mysql命令支持
+			ln -s /usr/java/mysql/bin/mysql /usr/bin/mysql
+		e、修改密码
+			mysql -u root
+			use mysql;
+			update user set password= password("1111") where user='root';
+			flush privileges;
+		f、开启远程登录权限
+			GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '1111' WITH GRANT OPTION;
+			flush privileges;
+		g、设置开机启动
+			chkconfig mysql on
+		d、启动和关闭mysql
+			service mysql start|stop|restart
+
+	2、配置mysql主从复制
+		a、配置主数据库
+			开启日志、修改server_id
+				vim /etc/my.cnf：
+					log_bin=master_log
+					server_id=1
+					
+		b、配置从数据库
+			修改server_id：
+				vim /etc/my.cnf：
+					server_id=1
+			修改uuid：
+				vim mysql/data/auto.cnf：
+					uuid=xxxxxxxxx
+			重启：
+				service mysql restart
+		c、修改slave
+				mysql> change master to master_host='192.168.204.139',master_user='root',master_password='1111',master_log_file='master_log.00001'
+
+		d、查看主从状态
+			mysql> show slave status \G;
+
+二、MyCat
+	1、什么是MyCat？
+		是一个国产的数据库中间件，前身是阿里的cobar。
+	2、分库分表
+		分库：把usian拆成多个库
+		分表：把tb_order拆分到多个库里
+
+	3、mycat的核心概念
+		schema：逻辑上完整的库
+		table：逻辑上完整的表
+		dataHost：服务器
+		dataNode：服务器上的mysql
+		rule：分片规则
+	4、分片规则
+		crc32slot规则：
+			分片字段使用主键
+			tableRule：一个表一个
+			数据库节点数量
+	5、配置mycat的分库分表和读写分离
+		a、schema.xml作用：schema、table、dataHost、dataNode、rule
+		b、rule.xml：分片规则
+		c、server.xml：mycat的用户名、密码和权限
+
+------------------------14、网关服务、熔断处理-------------------------------------------
+一、网关服务
+  1、路由
+	所有请求通过zuul访问consumer
+  2、容错
+	客户端通过zuul无法调用consumer，使用zuul对consumer进行降级
+  3、限流
+	 使用令牌桶算法实现zuul对consumer的限流
+
+二、熔断处理
+	1、降级
+		consumer无法调用provider时，使用hystrix对provider进行降级
+	2、熔断
+		当失败率、线程池和信号量达到阀值时自动触发降级，熔断触发的降级会在指定时间后测试服务是否恢复
+
+--------------------------------15、分布式配置中心、消息总线-----------------------------
+一、分布式配置中心config
+	集中管理配置文件
+
+二、消息总选bus
+	运行期间当配置发生变动时，服务器不需要重启即可同步配置的变化

@@ -54,9 +54,7 @@ public class SearchItemServiceImpl implements SearchItemService {
     public Boolean importAll() {
         try {
             if (!isExistsIndex()) {
-                System.out.println("哈哈哈哈哈哈");
                 boolean index = createIndex();
-                System.out.println("哈哈哈哈哈哈"+index);
             }
 
             int page = 1;
@@ -81,8 +79,6 @@ public class SearchItemServiceImpl implements SearchItemService {
 
             return false;
         }
-
-
     }
 
     /**
@@ -146,7 +142,6 @@ public class SearchItemServiceImpl implements SearchItemService {
     @Override
     public int insertDocument(String itemId) throws IOException {
         SearchItem searchItem = searchItemMapper.getItemById(Long.valueOf(itemId));
-
         IndexRequest indexRequest = new IndexRequest(ES_INDEX_NAME, ES_TYPE_NAME);
         indexRequest.source(JsonUtils.objectToJson(searchItem), XContentType.JSON);
         IndexResponse indexResponse = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);

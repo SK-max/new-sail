@@ -3,6 +3,7 @@ package com.usian.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.usian.IDUtils;
+import com.usian.MD5Utils;
 import com.usian.PageResult;
 import com.usian.mapper.TbItemDescMapper;
 import com.usian.mapper.TbItemMapper;
@@ -161,6 +162,7 @@ public class ItemServiceImpl implements ItemService {
     public void insertTbItem(TbItem tbItem, String desc, String itemParams) {
 
         //补全Item
+
         Long itemId = IDUtils.genItemId();
         Date date = new Date();
         tbItem.setId(itemId);
